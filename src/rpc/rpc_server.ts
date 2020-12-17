@@ -1,20 +1,13 @@
-import { Connection, Channel, Replies, ConsumeMessage } from 'amqplib'
+import { Channel, Replies, ConsumeMessage } from 'amqplib'
 
 export class RpcServer {
-  private readonly connection: Connection
   private channel!: Channel
   private queue!: string
   private queueName: string
 
-  constructor({ queueName, connection }: { queueName: string; connection: Connection }) {
+  constructor({ queueName, channel }: { queueName: string; channel: Channel }) {
     this.queueName = queueName
-    this.connection = connection
-  }
-
-  async createChannel(): Promise<Channel> {
-    const channel = await this.connection.createChannel()
     this.channel = channel
-    return channel
   }
 
   async assert(): Promise<Replies.AssertQueue | undefined> {
@@ -25,21 +18,19 @@ export class RpcServer {
     return assert
   }
 
-  async sendMessage(replyToQueueName: string, message: Buffer, correlationId: string) {
-    if (this.channel) {
-      this.channel.sendToQueue(replyToQueueName, message, { correlationId })
-      console.log(`-> Message sent successfully: ${message}`)
-    }
+  async sendMessage(replyToQueueName: string, message: Buffer, correlationId: string): Promise<void> {
+    this.channel.sendToQueue(replyToQueueName, message, { correlationId })
+    console.log(`-> Callback message sent successfully: ${message}\n`)
   }
 
   async consume(): Promise<Replies.Consume> {
-    return await this.channel.consume(this.queue, this.handleMessage, { noAck: true })
+    return await this.channel.consume(this.queue, (msg) => this.handleMessage(msg), { noAck: true })
   }
 
-  async run() {
-    await this.createChannel()
+  async run(): Promise<void> {
     await this.assert()
     await this.consume()
+    console.log('RPC Server is running...\n')
   }
 
   private handleMessage(msg: ConsumeMessage | null): void {

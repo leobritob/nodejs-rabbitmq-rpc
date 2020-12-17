@@ -1,28 +1,14 @@
 version: '3.1'
 
 services:
-  nodejs_rabbitmq_rpc_project:
-    container_name: nodejs_rabbitmq_rpc_project
-    build: .
-    env_file: .env
-    environment:
-      - AMQP_HOST=${AMQP_HOST}
-      - AMQP_PORT=${AMQP_PORT}
-      - QUEUE_NAME=${QUEUE_NAME}
-    volumes:
-      - volume_default:/usr/src/app
-    networks:
-      - network_default
-    depends_on:
-      - rabbitmq
-
   rabbitmq:
-    image: rabbitmq:alpine
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports: 
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - network_default
-
-volumes:
-  volume_default:
 
 networks:
   network_default:

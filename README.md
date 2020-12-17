@@ -1,6 +1,35 @@
 # Node.js RabbitMQ RPC
 Esse repositório realiza uma implementação de um client com NodeJS e um server RabbitMQ, aplicando o conceito RPC.
 
+## Requisitos
+* Docker
+* Node.js + npm
+
+## Configurar o projeto
+```bash
+# Clone o repositório
+git clone git@github.com:leobritob/nodejs-rabbitmq-rpc.git
+
+# Com o Docker rodando, execute
+docker-compose up -d
+
+# Instale as dependencias do projeto
+npm install
+```
+
+## Executar o server
+```bash
+# Execute
+npm run start:server
+```
+
+## Executar o cliente
+```bash
+# Em um outro terminal, execute
+npm run start:client "Sua mensagem aqui"
+```
+
+___
 ## Node.js
 NodeJS é uma das maiores criações da tecnologia que já se existiu, é uma plataforma que podemos escrever javascript para front-end e back-end, automatizar processos, desenvolver APIs, realizar comunicação em tempo real e muito mais, tudo isso com apenas uma linguagem, Javascript.
 

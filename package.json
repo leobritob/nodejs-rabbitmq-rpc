@@ -6,14 +6,17 @@
   "scripts": {
     "build": "tsc",
     "start:dev": "tsnd --transpile-only --respawn --ignore-watch node_modules src/index.ts",
-    "start:server": "npm run build && node dist/rpc_server.js",
-    "start:client": "npm run build && node dist/rpc_client.js"
+    "prestart:server": "npm run build",
+    "start:server": "node dist/server.js",
+    "prestart:client": "npm run build",
+    "start:client": "node dist/client.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.6.0",
+    "dotenv": "^8.2.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

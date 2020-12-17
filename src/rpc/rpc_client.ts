@@ -7,15 +7,10 @@ export class RpcClient {
   private queue!: string
   private queueName: string
 
-  constructor({ queueName, connection }: { queueName: string; connection: Connection }) {
+  constructor({ queueName, connection, channel }: { queueName: string; connection: Connection; channel: Channel }) {
     this.queueName = queueName
     this.connection = connection
-  }
-
-  async createChannel(): Promise<Channel> {
-    const channel = await this.connection.createChannel()
     this.channel = channel
-    return channel
   }
 
   async assert(): Promise<Replies.AssertQueue> {
@@ -30,17 +25,16 @@ export class RpcClient {
     return await this.channel.consume(this.queue, (message) => this.handleMessages(message, correlationId), options)
   }
 
-  async sendMessage(message: string, correlationId: string) {
+  async sendMessage(message: string, correlationId: string): Promise<void> {
     const content = Buffer.from(JSON.stringify(message))
     const options = { correlationId, replyTo: this.queue }
 
     this.channel.sendToQueue(this.queueName, content, options)
 
-    console.log(`-> Message sent successfully: ${message}`)
+    console.log(`<- Message sent successfully: ${message}`)
   }
 
-  async run(message: string) {
-    await this.createChannel()
+  async run(message: string): Promise<void> {
     await this.assert()
 
     const correlationId = uuid()
@@ -54,7 +48,7 @@ export class RpcClient {
     if (message.properties.correlationId == correlationId) {
       const content = message.content.toString()
 
-      console.log(`<- Message sent successfully: ${content}`)
+      console.log(`-> Callback message received successfully: ${content}`)
 
       this.closeProcess()
     }
